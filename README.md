@@ -15,7 +15,7 @@ This project demonstrates training a Convolutional Neural Network (CNN) on 4x4 m
   - Training and validation metrics
 
 ## Web Version
-Visit the [GitHub Pages site](https://YOUR_USERNAME.github.io/cnn_visual/) to see the live visualization running in your browser.
+Visit the [GitHub Pages site](https://mirjunaid26.github.io/cnn_visual/) to see the live visualization running in your browser.
 
 ## Local Python Version
 
