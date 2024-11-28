@@ -15,6 +15,19 @@
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .introduction {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
         }
         .container {
             display: grid;
@@ -24,21 +37,30 @@
         }
         .visualization-box {
             background: white;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            text-align: center;
-            color: #333;
+        .visualization-box h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .visualization-box p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            line-height: 1.4;
         }
         #status {
             text-align: center;
             margin: 20px 0;
-            padding: 10px;
+            padding: 15px;
             background: #e0e0e0;
             border-radius: 4px;
             font-weight: bold;
+            color: #2c3e50;
         }
         .plots-container {
             grid-column: 1 / -1;
@@ -46,39 +68,113 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
+        .key-points {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+            color: #666;
+        }
+        .key-points ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .key-points li {
+            margin: 3px 0;
+        }
     </style>
 </head>
 <body>
-    <h1>CNN Training Visualization</h1>
+    <div class="header">
+        <h1>CNN Training Visualization</h1>
+        <p>Watch a Convolutional Neural Network learn to classify 4x4 matrices in real-time</p>
+    </div>
+
+    <div class="introduction">
+        <h2>About This Visualization</h2>
+        <p>This interactive visualization demonstrates how a Convolutional Neural Network (CNN) processes and learns from 4x4 matrices. The network is trained to classify matrices based on whether their sum is greater than 8 or not.</p>
+        <p>Each component below shows a different aspect of the CNN's operation, from the input data to the final training metrics. The visualizations update in real-time as the network trains.</p>
+    </div>
+
     <div id="status">Initializing...</div>
     
     <div class="container">
         <div class="visualization-box">
             <h3>Input Matrix</h3>
+            <p>This 4x4 matrix shows the current input being processed by the network. Values range from 0 (light) to 1 (dark). The network learns to classify these matrices based on whether their sum exceeds 8.</p>
             <div id="input-matrix"></div>
+            <div class="key-points">
+                <ul>
+                    <li>Randomly generated 4x4 matrices</li>
+                    <li>Values between 0 and 1</li>
+                    <li>Updates during training</li>
+                </ul>
+            </div>
         </div>
         
         <div class="visualization-box">
             <h3>Convolutional Filters</h3>
+            <p>These 2x2 filters are learned by the network during training. They detect different patterns in the input matrix. Watch how they evolve as the network learns!</p>
             <div id="conv-filters"></div>
+            <div class="key-points">
+                <ul>
+                    <li>2x2 learnable filters</li>
+                    <li>Adapts during training</li>
+                    <li>Different filters detect different patterns</li>
+                </ul>
+            </div>
         </div>
         
         <div class="visualization-box">
             <h3>Feature Maps</h3>
+            <p>The result of applying convolutional filters to the input matrix. These maps show what patterns the network "sees" in the input data.</p>
             <div id="feature-maps"></div>
+            <div class="key-points">
+                <ul>
+                    <li>Output of convolution operation</li>
+                    <li>Highlights detected patterns</li>
+                    <li>Changes as filters learn</li>
+                </ul>
+            </div>
         </div>
         
         <div class="visualization-box">
             <h3>Pooling Output</h3>
+            <p>After convolution, the feature maps are condensed using max pooling. This reduces the size while preserving important features.</p>
             <div id="pooling-output"></div>
+            <div class="key-points">
+                <ul>
+                    <li>2x2 max pooling</li>
+                    <li>Reduces spatial dimensions</li>
+                    <li>Preserves important features</li>
+                </ul>
+            </div>
         </div>
         
         <div class="plots-container">
             <div class="visualization-box">
+                <h3>Training Loss</h3>
+                <p>The loss measures how far the network's predictions are from the true labels. It should decrease during training, indicating improvement.</p>
                 <div id="loss-plot"></div>
+                <div class="key-points">
+                    <ul>
+                        <li>Lower is better</li>
+                        <li>Should decrease over time</li>
+                        <li>Indicates learning progress</li>
+                    </ul>
+                </div>
             </div>
             <div class="visualization-box">
+                <h3>Training Accuracy</h3>
+                <p>The percentage of correct predictions made by the network. This should increase as the network learns to classify the matrices better.</p>
                 <div id="accuracy-plot"></div>
+                <div class="key-points">
+                    <ul>
+                        <li>Higher is better</li>
+                        <li>Should increase over time</li>
+                        <li>Shows classification performance</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
