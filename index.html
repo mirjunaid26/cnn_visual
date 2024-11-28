@@ -1,83 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CNN Visualization - 4x4 Matrix Training</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .visualization-box {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        #status {
-            text-align: center;
-            margin: 20px 0;
-            padding: 10px;
-            background: #e0e0e0;
-            border-radius: 4px;
-        }
-        .plots-container {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-    </style>
+    <title>CNN Visualization Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
 </head>
 <body>
-    <h1>CNN Training Visualization</h1>
-    <div id="status">Initializing...</div>
-    
-    <div class="container">
-        <div class="visualization-box">
-            <h3>Input Matrix</h3>
-            <div id="input-matrix"></div>
-        </div>
-        
-        <div class="visualization-box">
-            <h3>Convolutional Filters</h3>
-            <div id="conv-filters"></div>
-        </div>
-        
-        <div class="visualization-box">
-            <h3>Feature Maps</h3>
-            <div id="feature-maps"></div>
-        </div>
-        
-        <div class="visualization-box">
-            <h3>Pooling Output</h3>
-            <div id="pooling-output"></div>
-        </div>
-        
-        <div class="plots-container">
-            <div class="visualization-box">
-                <div id="loss-plot"></div>
-            </div>
-            <div class="visualization-box">
-                <div id="accuracy-plot"></div>
-            </div>
-        </div>
-    </div>
-    
-    <script src="web_cnn.js"></script>
+    <h1>CNN Visualization Test</h1>
+    <div id="status">Loading...</div>
+    <div id="test-plot"></div>
+
+    <script>
+        // Simple test script
+        window.addEventListener('load', async () => {
+            const status = document.getElementById('status');
+            
+            try {
+                // Test TensorFlow.js
+                if (typeof tf === 'undefined') {
+                    throw new Error('TensorFlow.js not loaded');
+                }
+                status.textContent = 'TensorFlow.js loaded successfully';
+                console.log('TensorFlow.js version:', tf.version.tfjs);
+
+                // Test Plotly
+                if (typeof Plotly === 'undefined') {
+                    throw new Error('Plotly not loaded');
+                }
+                console.log('Plotly loaded successfully');
+
+                // Create a simple test plot
+                const data = [
+                    {
+                        z: [[1, 2], [3, 4]],
+                        type: 'heatmap'
+                    }
+                ];
+                
+                const layout = {
+                    title: 'Test Plot',
+                    width: 400,
+                    height: 400
+                };
+
+                await Plotly.newPlot('test-plot', data, layout);
+                status.textContent = 'All libraries loaded and test plot created successfully';
+
+            } catch (error) {
+                console.error('Error:', error);
+                status.textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
 </body>
 </html>
