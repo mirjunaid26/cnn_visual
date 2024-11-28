@@ -69,5 +69,58 @@ git push -u origin main
 4. Select 'main' branch as source
 5. Save and wait for the page to be published
 
+## Web Version (TensorFlow.js)
+
+The web version uses TensorFlow.js to run the CNN directly in your browser. This version provides real-time visualization of the training process.
+
+### Running the Web Version
+
+You can run the web version in two ways:
+
+1. **Using Python's HTTP Server**:
+   ```bash
+   # Navigate to the project directory
+   cd /path/to/cnn_visual
+   
+   # Start the server
+   python -m http.server 8000
+   ```
+   Then open your browser and visit: `http://localhost:8000`
+
+2. **Using GitHub Pages**:
+   - Push the code to a GitHub repository
+   - Enable GitHub Pages in your repository settings
+   - Visit `https://<your-username>.github.io/<repository-name>`
+
+### Features
+- Real-time visualization of:
+  - Input 4x4 matrices
+  - Convolutional filters
+  - Feature maps after convolution
+  - Pooling layer outputs
+  - Training and validation loss curves
+  - Accuracy metrics
+
+### Technical Details
+- Built with TensorFlow.js for neural network operations
+- Uses Plotly.js for interactive visualizations
+- Runs entirely in the browser (no backend required)
+- Responsive design that works on various screen sizes
+
+## Files
+- `index.html`: Main web interface
+- `web_cnn.js`: TensorFlow.js implementation of the CNN and visualizations
+- `README.md`: This documentation
+- `.gitignore`: Git ignore file for the project
+
+## Browser Compatibility
+The web version has been tested and works on:
+- Chrome (recommended)
+- Firefox
+- Safari
+
+## Contributing
+Feel free to open issues or submit pull requests for improvements!
+
 ## License
 MIT License
