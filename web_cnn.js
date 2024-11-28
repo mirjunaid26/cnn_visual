@@ -12,18 +12,22 @@ function generateData(numSamples) {
         
         for (let i = 0; i < numSamples; i++) {
             // Create a 4x4 matrix with random values between 0 and 1
-            const matrix = Array(4).fill().map(() => 
-                Array(4).fill().map(() => Math.random())
+            const matrix = Array.from({ length: 4 }, () => 
+                Array.from({ length: 4 }, () => Math.random())
             );
+            
+            // Calculate sum and create label (1 if sum > 8, 0 otherwise)
             const sum = matrix.flat().reduce((a, b) => a + b, 0);
             const label = sum > 8 ? 1 : 0;
             
-            data.push(matrix);
+            // Reshape matrix to [4, 4, 1] for CNN input
+            const reshapedMatrix = matrix.map(row => [row]);
+            data.push(reshapedMatrix);
             labels.push(label);
         }
         
-        // Convert to tensors
-        const xTensor = tf.tensor4d(data, [numSamples, 4, 4, 1]);
+        // Convert to tensors with proper shapes
+        const xTensor = tf.tensor4d(data);
         const yTensor = tf.oneHot(tf.tensor1d(labels, 'int32'), 2);
         
         return [xTensor, yTensor];
@@ -42,10 +46,10 @@ function createModel() {
         model.add(tf.layers.conv2d({
             inputShape: [4, 4, 1],
             filters: 4,
-            kernelSize: 2,
+            kernelSize: [2, 2],
             padding: 'same',
             activation: 'relu',
-            kernelInitializer: 'glorotUniform'
+            kernelInitializer: 'glorotNormal'
         }));
         
         // Add max pooling layer
@@ -61,7 +65,7 @@ function createModel() {
         model.add(tf.layers.dense({
             units: 2,
             activation: 'softmax',
-            kernelInitializer: 'glorotUniform'
+            kernelInitializer: 'glorotNormal'
         }));
         
         return model;
@@ -72,37 +76,41 @@ function createModel() {
 }
 
 // Visualization functions
-function plotMatrix(elementId, data, title) {
+function plotMatrix(elementId, data, title = '') {
     try {
-        const layout = {
-            title: title || '',
-            height: 250,
-            width: 250,
-            margin: { t: 30, b: 30, l: 30, r: 30 },
-            xaxis: {
-                showticklabels: false,
-                showgrid: false,
-                zeroline: false
-            },
-            yaxis: {
-                showticklabels: false,
-                showgrid: false,
-                zeroline: false
-            }
-        };
-        
-        const trace = {
-            z: data,
-            type: 'heatmap',
-            colorscale: 'Viridis',
-            showscale: false
-        };
-        
-        Plotly.newPlot(elementId, [trace], layout, {displayModeBar: false});
+        // Ensure data is 2D
+        if (data[0] && Array.isArray(data[0])) {
+            const layout = {
+                title: title,
+                height: 250,
+                width: 250,
+                margin: { t: 30, b: 30, l: 30, r: 30 },
+                xaxis: {
+                    showticklabels: false,
+                    showgrid: false,
+                    zeroline: false
+                },
+                yaxis: {
+                    showticklabels: false,
+                    showgrid: false,
+                    zeroline: false
+                }
+            };
+            
+            const trace = {
+                z: data,
+                type: 'heatmap',
+                colorscale: 'Viridis',
+                showscale: false
+            };
+            
+            Plotly.newPlot(elementId, [trace], layout, {displayModeBar: false})
+                .catch(error => console.error(`Plotly error for ${elementId}:`, error));
+        } else {
+            console.error(`Invalid data format for ${elementId}:`, data);
+        }
     } catch (error) {
         console.error(`Error plotting matrix for ${elementId}:`, error);
-        console.error('Data:', data);
-        throw error;
     }
 }
 
@@ -118,8 +126,18 @@ function plotTrainingProgress() {
         };
         
         Plotly.newPlot('loss-plot', [
-            { y: trainLosses, name: 'Training Loss', mode: 'lines', line: { color: 'blue' } },
-            { y: valLosses, name: 'Validation Loss', mode: 'lines', line: { color: 'red' } }
+            { 
+                y: trainLosses,
+                name: 'Training Loss',
+                mode: 'lines',
+                line: { color: 'blue' }
+            },
+            { 
+                y: valLosses,
+                name: 'Validation Loss',
+                mode: 'lines',
+                line: { color: 'red' }
+            }
         ], lossLayout);
         
         // Accuracy plot
@@ -132,12 +150,21 @@ function plotTrainingProgress() {
         };
         
         Plotly.newPlot('accuracy-plot', [
-            { y: trainAccs, name: 'Training Accuracy', mode: 'lines', line: { color: 'blue' } },
-            { y: valAccs, name: 'Validation Accuracy', mode: 'lines', line: { color: 'red' } }
+            { 
+                y: trainAccs,
+                name: 'Training Accuracy',
+                mode: 'lines',
+                line: { color: 'blue' }
+            },
+            { 
+                y: valAccs,
+                name: 'Validation Accuracy',
+                mode: 'lines',
+                line: { color: 'red' }
+            }
         ], accLayout);
     } catch (error) {
         console.error('Error in plotTrainingProgress:', error);
-        throw error;
     }
 }
 
@@ -147,31 +174,29 @@ async function trainModel() {
     statusElement.textContent = 'Generating training data...';
     
     try {
-        console.log('Starting training process...');
+        // Memory cleanup
+        tf.disposeVariables();
+        trainLosses = [];
+        trainAccs = [];
+        valLosses = [];
+        valAccs = [];
         
         // Generate data
         const [X_train, y_train] = generateData(100);
-        console.log('Training data generated:', {
-            xShape: X_train.shape,
-            yShape: y_train.shape
-        });
-        
         const [X_val, y_val] = generateData(30);
-        console.log('Validation data generated');
         
         // Create and compile model
-        console.log('Creating model...');
+        statusElement.textContent = 'Creating model...';
         const model = createModel();
+        
         model.compile({
             optimizer: tf.train.adam(0.001),
             loss: 'categoricalCrossentropy',
             metrics: ['accuracy']
         });
-        console.log('Model compiled');
         
         // Initial visualizations
-        console.log('Setting up initial visualizations...');
-        const initialMatrix = X_train.slice([0], [1]).squeeze().arraySync();
+        const initialMatrix = X_train.slice([0, 0, 0, 0], [1, 4, 4, 1]).reshape([4, 4]).arraySync();
         plotMatrix('input-matrix', initialMatrix, 'Input Matrix');
         
         // Training loop
@@ -179,8 +204,6 @@ async function trainModel() {
         statusElement.textContent = 'Training...';
         
         for (let epoch = 0; epoch < numEpochs; epoch++) {
-            console.log(`Starting epoch ${epoch + 1}/${numEpochs}`);
-            
             // Train on batch
             const history = await model.fit(X_train, y_train, {
                 epochs: 1,
@@ -200,25 +223,28 @@ async function trainModel() {
                     // Get sample input
                     const sample = X_train.slice([0], [1]);
                     
-                    // Get conv layer weights
+                    // Get conv layer weights and visualize
                     const conv = model.layers[0];
-                    const convWeights = conv.getWeights()[0].squeeze().arraySync();
-                    plotMatrix('conv-filters', convWeights[0], 'Convolution Filter');
+                    const convWeights = conv.getWeights()[0].reshape([2, 2]).arraySync();
+                    plotMatrix('conv-filters', convWeights, 'Convolution Filter');
                     
-                    // Get feature maps
+                    // Get and visualize feature maps
                     const convOutput = tf.model({
                         inputs: model.input,
                         outputs: conv.output
                     }).predict(sample);
-                    plotMatrix('feature-maps', convOutput.squeeze().arraySync()[0], 'Feature Map');
                     
-                    // Get pooling output
-                    const pooling = model.layers[1];
+                    const featureMap = convOutput.slice([0, 0, 0, 0], [1, 4, 4, 1]).reshape([4, 4]).arraySync();
+                    plotMatrix('feature-maps', featureMap, 'Feature Map');
+                    
+                    // Get and visualize pooling output
                     const poolOutput = tf.model({
                         inputs: model.input,
-                        outputs: pooling.output
+                        outputs: model.layers[1].output
                     }).predict(sample);
-                    plotMatrix('pooling-output', poolOutput.squeeze().arraySync()[0], 'Pooling Output');
+                    
+                    const poolMap = poolOutput.slice([0, 0, 0, 0], [1, 3, 3, 1]).reshape([3, 3]).arraySync();
+                    plotMatrix('pooling-output', poolMap, 'Pooling Output');
                     
                     // Update training plots
                     plotTrainingProgress();
@@ -231,12 +257,10 @@ async function trainModel() {
         }
         
         statusElement.textContent = 'Training complete!';
-        console.log('Training completed successfully');
         
     } catch (error) {
-        console.error('Detailed error in training:', error);
+        console.error('Error in training:', error);
         statusElement.textContent = `Error: ${error.message}. Check console for details.`;
-        throw error;
     } finally {
         // Clean up tensors
         tf.disposeVariables();
@@ -257,6 +281,7 @@ window.addEventListener('load', () => {
         console.log('TensorFlow.js initialized, starting training...');
         trainModel().catch(error => {
             console.error('Training failed:', error);
+            document.getElementById('status').textContent = 'Training failed. Check console for details.';
         });
     });
 });
