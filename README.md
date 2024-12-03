@@ -129,3 +129,5 @@ This project is open source and available under the MIT License.
 - TensorFlow.js team for the excellent deep learning library
 - Plotly team for the visualization tools
 - The deep learning community for inspiration and knowledge sharing
+
+## DOI: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14267207.svg)](https://doi.org/10.5281/zenodo.14267207)
