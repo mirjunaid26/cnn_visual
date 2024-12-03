@@ -131,3 +131,5 @@ This project is open source and available under the MIT License.
 - The deep learning community for inspiration and knowledge sharing
 
 ## DOI: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14267207.svg)](https://doi.org/10.5281/zenodo.14267207)
+
+## DOI_2" [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14267244.svg)](https://doi.org/10.5281/zenodo.14267244)
